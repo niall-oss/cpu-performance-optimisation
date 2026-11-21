@@ -18,7 +18,7 @@ dev = [
 include = ["tests"]
 
 [tool.ty.environment]
-extra-paths = ["tests", "profiler/res/scripts/client"]
+extra-paths = ["tests", "profiler/res/scripts/client", "optimisation/res/scripts/client"]
 
 [tool.ruff]
 include = ["tests/**/*.py"]

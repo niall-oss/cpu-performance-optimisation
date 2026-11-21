@@ -20,6 +20,12 @@ Paths are under `source/res/scripts/`.
 - **Battle clock**: `arena.periodEndTime - BigWorld.serverTime()` is the time left shown on screen.
 - **Interpreter**: Python 2.7. `threading`, `sys._current_frames` and `ctypes` are in `common/Lib`. `cProfile.py` is there too, but `WorldOfTanks.exe` 2.4.1.1 contains no `_lsprof`, so cProfile can't be used.
 
+## Game behaviour the optimisation mod relies on
+
+- **Shell tooltips**: `client/gui/Scaleform/daapi/view/battle/shared/consumables_panel.py` `ConsumablesPanel._makeShellTooltip(descriptor, gunSettings)` is the only place shell tooltip text is built. Its callers are `_addShellSlot` (passes the text to `as_addShellSlotS`), `__updateAllShellTooltips` (from `__onVehicleFeedbackReceived` on `FEEDBACK_EVENT_ID.VEHICLE_ATTRS_CHANGED`, and from `__updateMechanicShellMode`), both passing it to `as_updateTooltipS`. With `GUI_SETTINGS.technicalInfo` off it only formats the header, so the mod leaves that case alone. The placeholder uses the module's own `TOOLTIP_FORMAT`, `backport` and `R`.
+- **Attribute syncs**: `client/Avatar.py` `syncVehicleAttrs` → `feedback_adaptor.setVehicleAttrs` → `onVehicleFeedbackReceived(VEHICLE_ATTRS_CHANGED, …)`. In a 2.4.1.1 replay each one cost about 25 ms in `__updateAllShellTooltips`.
+- **Showing a tooltip**: the `{HEADER}…{/HEADER}{BODY}…{/BODY}` text is a complex tooltip. Flash hands the string back to `client/gui/Scaleform/framework/tooltip_mgr.py` `ToolTip.onCreateComplexTooltip(tooltipId, stateType)`, which parses it with `ComplexBuilder` (`client/gui/shared/tooltips/builders.py`, `complex_formatters.doFormatToolTip`). The battle app uses this `ToolTip` (`client/gui/Scaleform/battle_entry.py`). The mod swaps its placeholder for the real text there. The Flash side was not inspected, but in the 2.4.1.1 client hovering a shell showed its full stats with the mod on.
+
 ## Updating for a new patch
 
 1. Find the new branch: `git ls-remote --heads https://github.com/StranikS-Scan/WorldOfTanks-Decompiled.git`.

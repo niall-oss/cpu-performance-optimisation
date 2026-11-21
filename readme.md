@@ -4,7 +4,35 @@ Tools for finding and reducing the CPU cost of World of Tanks' Python script lay
 
 | Mod | Folder | Status |
 |---|---|---|
+| CPU Performance Optimisation | `optimisation/` | Local testing |
 | CPU Profiler | `profiler/` | Development tool, not for distribution |
+
+## CPU Performance Optimisation
+
+Removes CPU stutters caused by the game's own Python UI code. Average FPS doesn't change; the worst frames do.
+
+### Lazy shell tooltips
+
+With technical info turned on in the game's settings, the ammo panel rebuilds every shell's tooltip whenever the server re-sends your vehicle's attributes. That takes about 25 ms on the main thread, about 15 times a battle, for text you only see when hovering a shell. The mod gives each slot a short placeholder instead and builds the real tooltip the first time you hover that shell after a change.
+
+If the swap ever fails, the tooltip shows just the shell type and name.
+
+### Build and install
+
+```powershell
+C:\Python27\python.exe build.py optimisation
+```
+
+Copy `build/ANIALLATOR.CPU_Performance_Optimisation_<version>.wotmod` into `World_of_Tanks/mods/<game_version>/`.
+
+### Config
+
+`World_of_Tanks/mods/configs/ANIALLATOR.cpu_performance/config.json`:
+
+| Key | Default | |
+|---|---|---|
+| `enabled` | `true` | Turns every fix off when `false` |
+| `lazyShellTooltips` | `true` | |
 
 ## CPU Profiler
 

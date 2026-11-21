@@ -18,6 +18,13 @@ MODS = {
         "folder": "profiler/res",
         "release": False,
     },
+    "optimisation": {
+        "name": "CPU Performance Optimisation",
+        "version": "0.1.0",
+        "description": "Removes CPU stutters caused by the game's Python UI code",
+        "folder": "optimisation/res",
+        "release": True,
+    },
 }
 
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
