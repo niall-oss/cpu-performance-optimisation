@@ -1,0 +1,45 @@
+name: Build mods
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: python:2.7.18-buster
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build wotmods
+        run: python build.py all
+
+      - name: Resolve release version and output path
+        id: meta
+        run: |
+          python build.py --release-outputs >> "$GITHUB_OUTPUT"
+          python build.py --release-outputs
+
+      - name: Upload PR artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
+        with:
+          name: wotmods-pr-${{ github.sha }}
+          path: build/*.wotmod
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && steps.meta.outputs.wotmod != ''
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: v${{ steps.meta.outputs.version }}
+          name: v${{ steps.meta.outputs.version }}
+          files: ${{ steps.meta.outputs.wotmod }}
+          generate_release_notes: true
+          make_latest: true
